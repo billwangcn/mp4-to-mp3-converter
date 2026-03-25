@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 MP4 转 MP3 在线转换</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .upload-form {
+            text-align: center;
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .flash-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .flash-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .flash-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .conversions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .conversions-table th,
+        .conversions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .conversions-table th {
+            background: #f8f9ff;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .conversions-table tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .file-size {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .actions {
+            white-space: nowrap;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .conversions-table {
+                font-size: 0.9rem;
+            }
+            
+            .conversions-table th,
+            .conversions-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 MP4 转 MP3</h1>
+            <p>在线音频提取工具 - 免费、快速、安全</p>
+        </div>
+        
+        <!-- Flash 消息 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- 上传表单 -->
+        <div class="card">
+            <h2 class="section-title">📤 上传文件</h2>
+            
+            <form class="upload-form" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">🎬</div>
+                    <div class="upload-text">点击选择文件或拖拽到此处</div>
+                    <div class="upload-hint">支持 MP4, MOV, AVI, MKV, M4A, WMV, FLV | 最大 500MB</div>
+                    <input type="file" id="fileInput" name="file" accept=".mp4,.m4a,.mov,.avi,.mkv,.wmv,.flv" onchange="this.form.submit()">
+                </div>
+                
+                <button type="submit" class="btn" id="uploadBtn">
+                    🚀 开始转换
+                </button>
+            </form>
+        </div>
+        
+        <!-- 转换历史 -->
+        <div class="card">
+            <h2 class="section-title">📋 转换历史</h2>
+            
+            {% if conversions %}
+                <table class="conversions-table">
+                    <thead>
+                        <tr>
+                            <th>文件名</th>
+                            <th>大小</th>
+                            <th>状态</th>
+                            <th>时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for conv in conversions %}
+                            <tr>
+                                <td>
+                                    <div class="file-name">{{ conv.original_filename }}</div>
+                                    {% if conv.error_message %}
+                                        <div style="color: #dc3545; font-size: 0.85rem;">{{ conv.error_message[:50] }}{% if conv.error_message|length > 50 %}...{% endif %}</div>
+                                    {% endif %}
+                                </td>
+                                <td class="file-size">{{ conv.file_size_formatted }}</td>
+                                <td>
+                                    <span class="status status-{{ conv.status }}">
+                                        {% if conv.status == 'pending' %}等待中
+                                        {% elif conv.status == 'processing' %}转换中
+                                        {% elif conv.status == 'completed' %}✅ 完成
+                                        {% elif conv.status == 'failed' %}❌ 失败
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td class="file-size">{{ conv.created_at[:16] if conv.created_at else 'N/A' }}</td>
+                                <td class="actions">
+                                    {% if conv.status == 'completed' %}
+                                        <a href="{{ url_for('download', conversion_id=conv.id) }}" class="btn btn-success" style="padding: 6px 15px; font-size: 0.9rem;">
+                                            ⬇️ 下载
+                                        </a>
+                                    {% endif %}
+                                    <form action="{{ url_for('delete_conversion', conversion_id=conv.id) }}" method="post" style="display: inline;" onsubmit="return confirm('确定要删除这条记录吗？')">
+                                        <button type="submit" class="btn btn-danger" style="padding: 6px 15px; font-size: 0.9rem;">
+                                            🗑️ 删除
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <div>暂无转换记录</div>
+                    <div style="font-size: 0.9rem; margin-top: 10px;">上传第一个视频文件开始使用</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        // 拖拽上传
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileInput.form.submit();
+            }
+        });
+        
+        // 自动刷新状态（每 5 秒）
+        setInterval(() => {
+            fetch('/health')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ffmpeg === 'not installed') {
+                        console.warn('⚠️ ffmpeg 未安装');
+                    }
+                });
+        }, 5000);
+    </script>
+</body>
+</html>
